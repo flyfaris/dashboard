@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faris — Command Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2026;
+    --border: #2a2d35;
+    --text: #f0f0f0;
+    --text2: #8a8f9e;
+    --text3: #555a68;
+    --jedco: #3b82f6;
+    --jedco-bg: rgba(59,130,246,0.1);
+    --deltabuild: #10b981;
+    --deltabuild-bg: rgba(16,185,129,0.1);
+    --baba: #f59e0b;
+    --baba-bg: rgba(245,158,11,0.1);
+    --family: #f43f5e;
+    --family-bg: rgba(244,63,94,0.1);
+    --personal: #8b5cf6;
+    --personal-bg: rgba(139,92,246,0.1);
+    --high: #ef4444;
+    --high-bg: rgba(239,68,68,0.12);
+    --medium: #f59e0b;
+    --medium-bg: rgba(245,158,11,0.12);
+    --low: #22c55e;
+    --low-bg: rgba(34,197,94,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .topbar-date { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .sync-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .sync-btn:hover { background: var(--border); color: var(--text); }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--low); }
+  .sync-dot.syncing { background: var(--medium); animation: pulse 1s infinite; }
+  .sync-dot.error { background: var(--high); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* MAIN */
+  .main { max-width: 640px; margin: 0 auto; padding: 20px 16px; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-top: 2px solid transparent;
+  }
+  .stat-card:hover { background: var(--surface2); }
+  .stat-card.active { border-top-color: var(--accent); background: var(--surface2); }
+  .stat-card-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-card-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-card-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+  /* ADD TASK */
+  .add-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .add-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .add-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--jedco); }
+  .add-input::placeholder { color: var(--text3); }
+  .add-selects { display: flex; gap: 8px; }
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+    flex: 1;
+  }
+  .add-btn {
+    background: var(--jedco);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { opacity: 0.85; }
+
+  /* FILTERS */
+  .filter-bar {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .fbtn {
+    height: 28px; padding: 0 12px; font-size: 11px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: transparent; color: var(--text3); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .fbtn:hover { color: var(--text2); border-color: var(--text3); }
+  .fbtn.active { background: var(--surface2); color: var(--text); border-color: var(--text2); }
+
+  /* SECTION HEADER */
+  .sec-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 16px 0 8px;
+    display: flex; align-items: center; gap-8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+  .sec-urgent { color: var(--high); }
+
+  /* TASK CARD */
+  .tasks-list { display: flex; flex-direction: column; gap: 6px; }
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 12px;
+    border-left: 3px solid var(--ctx-color);
+    transition: background 0.15s;
+  }
+  .task-card:hover { background: var(--surface2); }
+  .task-card.done { opacity: 0.4; }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--border);
+    cursor: pointer; flex-shrink: 0; margin-top: 1px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .check-box.checked { background: var(--ctx-color); border-color: var(--ctx-color); }
+  .check-icon { display: none; }
+  .check-box.checked .check-icon { display: block; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-text {
+    font-size: 13px; color: var(--text); line-height: 1.5;
+    word-break: break-word;
+  }
+  .task-card.done .task-text { text-decoration: line-through; color: var(--text3); }
+  .task-tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; align-items: center; }
+  .tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 20px;
+    font-weight: 500; letter-spacing: 0.2px;
+  }
+  .tag-jedco { background: var(--jedco-bg); color: var(--jedco); }
+  .tag-deltabuild { background: var(--deltabuild-bg); color: var(--deltabuild); }
+  .tag-baba { background: var(--baba-bg); color: var(--baba); }
+  .tag-family { background: var(--family-bg); color: var(--family); }
+  .tag-personal { background: var(--personal-bg); color: var(--personal); }
+  .tag-high { background: var(--high-bg); color: var(--high); }
+  .tag-medium { background: var(--medium-bg); color: var(--medium); }
+  .tag-low { background: var(--low-bg); color: var(--low); }
+  .tag-due-urgent { background: var(--high-bg); color: var(--high); }
+  .tag-due-ok { background: var(--low-bg); color: var(--low); }
+  .tag-due-warn { background: var(--medium-bg); color: var(--medium); }
+  .tag-blocked { background: var(--medium-bg); color: var(--medium); }
+  .tag-time { background: var(--personal-bg); color: var(--personal); }
+  .tag-date { font-size: 10px; color: var(--text3); }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 48px 20px;
+    color: var(--text3); font-size: 14px;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+  /* LOADING */
+  .loading {
+    text-align: center; padding: 48px; color: var(--text3); font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Command Centre</div>
+    <div class="topbar-date" id="topbar-date"></div>
+  </div>
+  <button class="sync-btn" onclick="loadTasks()">
+    <span class="sync-dot" id="sync-dot"></span>
+    <span id="sync-label">Refresh</span>
+  </button>
+</div>
+
+<div class="main">
+
+  <div class="stats-grid">
+    <div class="stat-card" id="sc-all" style="--accent:#8a8f9e" onclick="setCtx('all')">
+      <div class="stat-card-label">All</div>
+      <div class="stat-card-num" id="sn-all">—</div>
+      <div class="stat-card-sub" id="sp-all">pending</div>
+    </div>
+    <div class="stat-card" id="sc-jedco" style="--accent:var(--jedco)" onclick="setCtx('jedco')">
+      <div class="stat-card-label">JEDCO</div>
+      <div class="stat-card-num" id="sn-jedco">—</div>
+      <div class="stat-card-sub" id="sp-jedco">pending</div>
+    </div>
+    <div class="stat-card" id="sc-deltabuild" style="--accent:var(--deltabuild)" onclick="setCtx('deltabuild')">
+      <div class="stat-card-label">DeltaBuild</div>
+      <div class="stat-card-num" id="sn-deltabuild">—</div>
+      <div class="stat-card-sub" id="sp-deltabuild">pending</div>
+    </div>
+    <div class="stat-card" id="sc-baba" style="--accent:var(--baba)" onclick="setCtx('baba')">
+      <div class="stat-card-label">BABA</div>
+      <div class="stat-card-num" id="sn-baba">—</div>
+      <div class="stat-card-sub" id="sp-baba">pending</div>
+    </div>
+  </div>
+
+  <div class="add-box">
+    <div class="add-row">
+      <input class="add-input" id="task-input" type="text" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTask()">
+      <button class="add-btn" onclick="addTask()">+ Add</button>
+    </div>
+    <div class="add-selects">
+      <select id="task-ctx">
+        <option value="jedco">JEDCO</option>
+        <option value="deltabuild">DeltaBuild</option>
+        <option value="baba">BABA</option>
+        <option value="family">Family</option>
+        <option value="personal">Personal</option>
+      </select>
+      <select id="task-prio">
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="fbtn active" id="fv-due" onclick="setView('due')">By due date</button>
+    <button class="fbtn" id="fv-all" onclick="setView('all')">All</button>
+    <button class="fbtn" id="fs-pending" onclick="setStatus('pending')">Pending</button>
+    <button class="fbtn" id="fs-done" onclick="setStatus('done')">Done</button>
+    <button class="fbtn" id="fc-family" onclick="setCtx('family')">Family</button>
+    <button class="fbtn" id="fc-personal" onclick="setCtx('personal')">Personal</button>
+  </div>
+
+  <div id="tasks-list"><div class="loading">Loading tasks…</div></div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ikqfqwhwgzkobcmmgbbf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrcWZxd2h3Z3prb2JjbW1nYmJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMDQ4ODksImV4cCI6MjA5NDc4MDg4OX0.VTo25VYYbN4QFQ-H1YIyYvazkAAgtXe0J4_IQ1wmdBM';
+
+const CTX_COLORS = {jedco:'#3b82f6',deltabuild:'#10b981',baba:'#f59e0b',family:'#f43f5e',personal:'#8b5cf6'};
+const CTX_LABELS = {jedco:'JEDCO',deltabuild:'DeltaBuild',baba:'BABA',family:'Family',personal:'Personal'};
+
+let tasks = [], ctxFilter='all', statusFilter='all', viewMode='due';
+
+async function api(method, path, body){
+  const r = await fetch(SUPABASE_URL+'/rest/v1/'+path, {
+    method,
+    headers:{
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer '+SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method==='POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!r.ok){ const e=await r.text(); throw new Error(e); }
+  if(method==='DELETE')return null;
+  const txt=await r.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function loadTasks(){
+  setSyncing(true);
+  try{
+    tasks = await api('GET','tasks?order=created_at.desc');
+    render();
+    updateStats();
+    setSyncing(false);
+  }catch(e){
+    console.error(e);
+    setSyncError();
+  }
+}
+
+async function addTask(){
+  const inp=document.getElementById('task-input');
+  const text=inp.value.trim();
+  if(!text)return;
+  const ctx=document.getElementById('task-ctx').value;
+  const prio=document.getElementById('task-prio').value;
+  const today=new Date().toISOString().slice(0,10);
+  inp.value='';
+  try{
+    const res=await api('POST','tasks',{text,ctx,prio,done:false,date:today,due:null,blocked:false});
+    if(res&&res[0]) tasks.unshift(res[0]);
+    render(); updateStats();
+  }catch(e){console.error(e);}
+}
+
+async function toggleDone(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t)return;
+  t.done=!t.done;
+  render(); updateStats();
+  try{ await api('PATCH','tasks?id=eq.'+id,{done:t.done}); }catch(e){console.error(e);}
+}
+
+function setSyncing(done){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  if(done){ dot.className='sync-dot'; lbl.textContent='Synced'; }
+  else { dot.className='sync-dot syncing'; lbl.textContent='Syncing…'; }
+}
+function setSyncError(){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  dot.className='sync-dot error'; lbl.textContent='Error';
+}
+
+function daysUntil(due){
+  if(!due)return null;
+  const t=new Date(); t.setHours(0,0,0,0);
+  const d=new Date(due); d.setHours(0,0,0,0);
+  return Math.round((d-t)/(864e5));
+}
+
+function updateStats(){
+  const ctxs=['jedco','deltabuild','baba','family','personal'];
+  document.getElementById('sn-all').textContent=tasks.length;
+  document.getElementById('sp-all').textContent=tasks.filter(t=>!t.done).length+' pending';
+  ctxs.forEach(c=>{
+    const ct=tasks.filter(t=>t.ctx===c);
+    const en=document.getElementById('sn-'+c);
+    const ep=document.getElementById('sp-'+c);
+    if(en){en.textContent=ct.length; ep.textContent=ct.filter(t=>!t.done).length+' pending';}
+  });
+}
+
+function setView(v){
+  viewMode=v; ctxFilter='all'; statusFilter='all';
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fv-'+v).classList.add('active');
+  document.querySelectorAll('.stat-card').forEach(s=>s.classList.remove('active'));
+  render();
+}
+function setCtx(c){
+  ctxFilter=c; statusFilter='all'; viewMode='all';
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  const fb=document.getElementById('fc-'+c);if(fb)fb.classList.add('active');
+  document.querySelectorAll('.stat-card').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById('sc-'+c);if(sc)sc.classList.add('active');
+  render();
+}
+function setStatus(s){
+  statusFilter=s; ctxFilter='all'; viewMode='all';
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fs-'+s).classList.add('active');
+  document.querySelectorAll('.stat-card').forEach(s=>s.classList.remove('active'));
+  render();
+}
+
+function render(){
+  let pool=tasks.filter(t=>{
+    if(ctxFilter!=='all'&&t.ctx!==ctxFilter)return false;
+    if(statusFilter==='pending'&&t.done)return false;
+    if(statusFilter==='done'&&!t.done)return false;
+    return true;
+  });
+
+  const list=document.getElementById('tasks-list');
+  if(!pool.length){
+    list.innerHTML='<div class="empty"><div class="empty-icon">✓</div>No tasks here</div>';
+    return;
+  }
+
+  let html='';
+
+  if(viewMode==='due'){
+    const pending=pool.filter(t=>!t.done);
+    const done=pool.filter(t=>t.done);
+    const byDue={}, noDue=[];
+    pending.forEach(t=>{ if(t.due){if(!byDue[t.due])byDue[t.due]=[];byDue[t.due].push(t);} else noDue.push(t); });
+    Object.keys(byDue).sort().forEach(due=>{
+      const days=daysUntil(due);
+      const d=new Date(due);
+      const label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+      const urgent=days<=1;
+      html+=`<div class="sec-header ${urgent?'sec-urgent':''}">${urgent?'⚡ ':''}${label}</div>`;
+      byDue[due].sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(t=>{ html+=taskHTML(t); });
+    });
+    if(noDue.length){
+      html+=`<div class="sec-header">No deadline</div>`;
+      noDue.sort((a,b)=>({high:0,medium:1,low:2}[a.prio]-{high:0,medium:1,low:2}[b.prio])).forEach(t=>{ html+=taskHTML(t); });
+    }
+    if(done.length){
+      html+=`<div class="sec-header">Completed</div>`;
+      done.forEach(t=>{ html+=taskHTML(t); });
+    }
+  } else {
+    const pending=pool.filter(t=>!t.done).sort((a,b)=>({high:0,medium:1,low:2}[a.prio]-{high:0,medium:1,low:2}[b.prio]));
+    const done=pool.filter(t=>t.done);
+    pending.forEach(t=>{ html+=taskHTML(t); });
+    if(done.length){ html+=`<div class="sec-header">Completed</div>`; done.forEach(t=>{ html+=taskHTML(t); }); }
+  }
+
+  list.innerHTML=`<div class="tasks-list">${html}</div>`;
+}
+
+function taskHTML(t){
+  const color=CTX_COLORS[t.ctx]||'#888';
+  const days=daysUntil(t.due);
+  let dueTag='';
+  if(t.due&&!t.done){
+    const cls=days<=1?'tag-due-urgent':days<=3?'tag-due-warn':'tag-due-ok';
+    const label=days===0?'Today':days===1?'Tomorrow':days+' days';
+    dueTag=`<span class="tag ${cls}">📅 ${label}</span>`;
+  }
+  const timeTag=t.time&&!t.done?`<span class="tag tag-time">🕐 ${t.time}</span>`:'';
+  const blockedTag=t.blocked&&!t.done?`<span class="tag tag-blocked">🔒 Blocked</span>`:'';
+  const checkMark=t.done?`<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7L10 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`:'';
+  return `<div class="task-card ${t.done?'done':''}" style="--ctx-color:${color}">
+    <div class="check-box ${t.done?'checked':''}" onclick="toggleDone(${t.id})">
+      <span class="check-icon">${checkMark}</span>
+    </div>
+    <div class="task-body">
+      <div class="task-text">${esc(t.text)}</div>
+      <div class="task-tags">
+        <span class="tag tag-${t.ctx}">${CTX_LABELS[t.ctx]||t.ctx}</span>
+        <span class="tag tag-${t.prio}">${t.prio}</span>
+        ${dueTag}${timeTag}${blockedTag}
+        <span class="tag-date">${t.date||''}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Date
+document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// Boot
+loadTasks();
+</script>
+</body>
+</html>
