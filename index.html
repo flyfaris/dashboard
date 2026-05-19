@@ -439,7 +439,7 @@ async function addTask(){
   const today=new Date().toISOString().slice(0,10);
   inp.value='';
   try{
-    const res=await api('POST','tasks',{text,ctx,prio,done:false,date:today,due:null,blocked:false});
+    const res=await api('POST','tasks',{text,ctx,prio,done:false,data:today,due:null,blocked:false});
     if(res&&res[0]) tasks.unshift(res[0]);
     render(); updateStats();
   }catch(e){console.error(e);}
@@ -576,7 +576,7 @@ function taskHTML(t){
         <span class="tag tag-${t.ctx}">${CTX_LABELS[t.ctx]||t.ctx}</span>
         <span class="tag tag-${t.prio}">${t.prio}</span>
         ${dueTag}${timeTag}${blockedTag}
-        <span class="tag-date">${t.date||''}</span>
+        <span class="tag-date">${t.data||''}</span>
       </div>
     </div>
   </div>`;
